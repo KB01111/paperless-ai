@@ -18,7 +18,14 @@ class OpenAIService {
   }
 
   initialize() {
-    if (!this.client && config.aiProvider === 'ollama') {
+    if (!this.client && config.aiProvider === 'litellm') {
+      // Use LiteLLM proxy - supports 100+ providers
+      this.client = new OpenAI({
+        baseURL: config.litellm.apiUrl,
+        apiKey: config.litellm.apiKey
+      });
+      console.log('[Paperless] Using LiteLLM Proxy for AI calls');
+    } else if (!this.client && config.aiProvider === 'ollama') {
       this.client = new OpenAI({
         baseURL: config.ollama.apiUrl + '/v1',
         apiKey: 'ollama'
@@ -34,6 +41,19 @@ class OpenAIService {
           apiKey: config.openai.apiKey
         });
       }
+    }
+  }
+
+  // Get the appropriate model based on the AI provider
+  getModel() {
+    if (config.aiProvider === 'litellm') {
+      return config.litellm.model;
+    } else if (config.aiProvider === 'ollama') {
+      return config.ollama.model;
+    } else if (config.aiProvider === 'custom') {
+      return config.custom.model;
+    } else {
+      return process.env.OPENAI_MODEL || 'gpt-4';
     }
   }
 
@@ -84,7 +104,7 @@ class OpenAIService {
 
       let systemPrompt = '';
       let promptTags = '';
-      const model = process.env.OPENAI_MODEL;
+      const model = this.getModel(); // Get model based on AI provider
 
       // Parse CUSTOM_FIELDS from environment variable
       let customFieldsObj;

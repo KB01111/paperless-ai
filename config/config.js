@@ -70,6 +70,13 @@ module.exports = {
     apiUrl: process.env.PAPERLESS_API_URL,
     apiToken: process.env.PAPERLESS_API_TOKEN
   },
+  // LiteLLM Proxy (preferred - supports 100+ providers)
+  litellm: {
+    apiUrl: process.env.LITELLM_PROXY_URL || '',
+    apiKey: process.env.LITELLM_MASTER_KEY || '',
+    model: process.env.LLM_MODEL || 'gpt-4',
+    embeddingModel: process.env.EMBEDDING_MODEL || 'text-embedding-3-small'
+  },
   openai: {
     apiKey: process.env.OPENAI_API_KEY
   },
